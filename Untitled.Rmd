@@ -1,27 +1,72 @@
 ---
-title: "exercise"
-author: "seo"
-date: "2024-11-04"
-output: html_document
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: false
+    fig_caption: true
+    latex_engine: pdflatex
+    template: svm-latex-ms2.tex
+title: "Direct democracy and Same Sex Marriage"
+author: "Hyeri seo"
+date: "2024-11-08"
+abstract: "Here's where you write 100 to 250 words, depending on the journal, that describe your objective, methods, results, and conclusion."
+fontsize: 11pt
+spacing: single
+bibliography: /Users/hyeriseo/Documents/GitHub/Public-Opinion-Fall-24/Bibliography.bib
+biblio-style: apsr
+citecolor: black
+linkcolor: black
+endnote: no
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+
+# Title
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+# Introduction
+
+Does direct democratic institution give stronger legitimacy to marriage equality legislation?
+
+# Literature Review
+
+## Marriage Equality Legislation and Public Attitudes
+
+@doi:10.1177/0010414018797947 find that legislation of marriage equality shapes public's attitudes toward homosexuality. 
+
+## Direct Democracy and Attitudes toward Homosexuality
+
+
+# Method
+
+
+# Data 
+
+## Dependent Variable
+
+I use European Social Survey (ESS) data. The ESS dataset includes survey data from 39 European countries. 
+
+## Independent Variable
+
+The information of legislation is from various sources. I use the date the legislation was passed. I only include countries that passed marriage equality laws through parliamentary voting without referendum or initiative processes and countries that have used referendums or initiatives. Switzerland in 2021 held referendum. In Finland, 167,000 signed for citizen's initiative for same-sex marriage in 2014, and passed in February 2015. In Ireland, on May 2015 62% of yes, and bill passed on October 2015. 
+
+Chapel Hill Expert Survey (CHES) provides issue positions of parties in European countries. This dataset does not provide parties specific position toward marriage equality, but provides positions toward post-material issues. 
 
 ```{r cars}
 summary(cars)
 ```
 
-## Including Plots
+# Including Plots
 
 You can also embed plots, for example:
+
+
+# Including Plots
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
