@@ -1,0 +1,74 @@
+---
+output: 
+  pdf_document:
+    citation_package: natbib
+    keep_tex: false
+    fig_caption: true
+    latex_engine: pdflatex
+    template: svm-latex-ms2.tex
+title: "Direct democracy and Same Sex Marriage"
+author: "Hyeri seo"
+date: "2024-11-08"
+abstract: "Here's where you write 100 to 250 words, depending on the journal, that describe your objective, methods, results, and conclusion."
+fontsize: 11pt
+spacing: single
+bibliography: /Users/hyeriseo/Documents/GitHub/Public-Opinion-Fall-24/Bibliography.bib
+biblio-style: apsr
+citecolor: black
+linkcolor: black
+endnote: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Does direct democratic institution give stronger legitimacy to marriage equality legislation? 
+
+Why important?
+@Mettler_Soss_2004 state that "political science stops short of exploring public policies' influence on what citizens want, how strongly they want it, and whether they engage the political processes that hold the power to supply or deny it to them," pointing out that the question of influences of policies on attitudes has been overlooked in academia. @Mettler_Soss_2004 suggest that policies that define boundaries of membership - whether certain individuals are included in the same community - may affect citizens' sense of status, patterns of group identity, and the level of cohesion, as citizens tend to utilize social groups as a central referent for political thinking. 
+
+However, feedback effect of same-sex marriage legislation has been understudied. 
+
+Outline of this paper. 
+
+# Literature Review
+
+## Marriage Equality Legislation and Public Attitudes
+
+Do laws shape attitudes? If so, how? Previous studies have shown that public attitudes toward homosexuality changes after same-sex marriage legislation. @doi:10.1177/0010414018797947 find that legislation of marriage equality shapes public's attitudes toward homosexuality. 
+
+## Direct Democracy and Attitudes toward Homosexuality
+
+
+# Method
+
+
+# Data 
+
+## Dependent Variable
+
+I use European Social Survey (ESS) data. The ESS dataset includes survey data from 39 European countries. 
+
+## Independent Variable
+
+The information of legislation is from various sources. I use the date the legislation was passed. I only include countries that passed marriage equality laws through parliamentary voting without referendum or initiative processes and countries that have used referendums or initiatives. Switzerland in 2021 held referendum. In Finland, 167,000 signed for citizen's initiative for same-sex marriage in 2014, and passed in February 2015. In Ireland, on May 2015 62% of yes, and bill passed on October 2015. 
+
+Chapel Hill Expert Survey (CHES) provides issue positions of parties in European countries. This dataset does not provide parties specific position toward marriage equality, but provides positions toward post-material issues. 
+
+```{r cars}
+summary(cars)
+```
+
+# Findings
+
+You can also embed plots, for example:
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
