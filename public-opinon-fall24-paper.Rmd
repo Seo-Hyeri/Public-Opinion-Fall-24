@@ -1,0 +1,438 @@
+---
+output:
+  pdf_document:
+    citation_package: natbib
+    keep_tex: false
+    fig_caption: true
+    latex_engine: pdflatex
+    template: svm-latex-ms2.tex
+title: "Does the direct democratic process in same-sex marriage legislation matter for public attitudes toward gay rights?"
+author:
+- name: Hyeri Seo
+  affiliation: University of Iowa
+date: " `r format(Sys.time(), '%B %d, %Y')` "
+abstract: "Although direct democratic institutions have been increasingly employed
+  in policymaking process, the relationship between direct democracy in same-sex marriage
+  legislation and attitudes toward gay rights has not been investigated in a cross-national
+  context, with the exception of the United States. This paper aims to explore the
+  relationship between attitudes toward gay rights and same-sex marriage legislation
+  with direct democracy in cross-national contexts using European Social Survey data,
+  which encompass 39 countries and 11 survey rounds. Using multilevel logistic regression
+  with random intercepts for each country and survey round, I show that direct democracy
+  in legislation process is positively associated with pro-gay attitudes. However,
+  individuals who support parties less tolerant of gay rights tend to hold more intolerant
+  views when legislation involves direct democracy. While individuals, in general,
+  tend to hold more positive attitudes toward gay rights, partisans with more extreme
+  positions are more likely to hold intolerant attitudes toward gay rights. This result
+  strengthens the idea that parties are more salient with direct democratic institutions."
+fontsize: 12pt
+spacing: double
+bibliography: /Users/hyeriseo/Documents/GitHub/Public-Opinion-Fall-24/Bibliography.bib
+biblio-style: apsr
+citecolor: black
+linkcolor: black
+endnote: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(tidyverse)
+library(rio)
+library(tidyr)
+library(lubridate)
+library(labelled)
+library(modelsummary)
+library(interplot)
+library(texreg)
+library(aod)
+library(ggplot2)
+library(dotwhisker)
+library(extrafont)   
+library(showtext)
+library(sandwich)
+library(lmtest)
+library(stargazer)
+library(forestplot)
+library(broom)
+library(gridExtra)
+
+data1 <- readRDS("Data/ESS_1to11_cleaned_imputed.rds")  
+
+# factor variables 
+data1$legislation_factor <- factor(data1$legislation)
+data1$cntry_factor <- factor(data1$cntry)
+data1$essround_factor <- factor(data1$essround)
+
+```
+
+Does engaging the general public in same-sex marraige legislation make a difference in attitudes toward gay rights? The question of whether direct democratic institutions pose a threat to minorities is a long standing question [@Bell1978; @Gunn1981; @hainmuellerhangartner2019]. Most studies have focused on the policy outputs of direct democracy, suggesting that it puts minorities at risk by enabling the tyranny of the majority [@bochslerhug2015; @haidermarkeletal2007; @Lewis2011a]. However, few have examined how feedback effects vary when direct democratic measures are involved. @donovantolbert2013 explore whether the feedback effects of same-sex marriage differ, highlighting the "spillover" effect of direct democracy on how people evaluate minority groups targeted by such measures. They suggest that the environment created by direct democratic processes may differ from that of purely representational processes. Yet, whether this spillover effect of direct democracy applies in a cross-national context remains undetermined, as existing studies on this question have primarily focused on American contexts, particularly U.S. states. While cross-national studies have examined the effects of same-sex marriage legislation, they have not investigated how direct democratic processes condition attitudes toward gay rights across countries. 
+
+Cross-national research consistently suggests that same-sex marriage legislation reinforces positive attitudes toward gay rights, which is often referred as legitimizing effects [@Hooghemeeusen2013; @redman2018; @abouchadifinnigan]. However, such effects may differ under certain conditions, particularly when considering the legislative process. Findings from American politics suggest that stigmatizing effects are more likely to emerge among certain groups when the legislative process involves direct democratic institutions [@1998Cald]. Thus, this paper aims to expand the scope of analysis to a cross-national context, testing findings and theories drawn from the American politics literature. A cross-national examination provides broader generalizability of theories and allows for the testing competing explanations [@RaginCharlesC1987, pp.57-58].
+
+Direct democratic processes have become increasingly common in Europe, addressing a variety of policy and moral issues, including same-sex marriage. This trend has particularly accelerated following numerous referendums on EU-related matters [@LupiaArthur2004DDNA;@HollanderSaskia2019, pp.1-2]. As of 2024, same-sex marriage has been legislated in at least 21 European countries, and among them, three countries--Ireland, Finland, and Switzerland--engaged direct democratic processes in legalizing same-sex marriage. Ireland and Switzerland held referendums in 2015 and 2021, respectively, while Finland's same-sex marriage legislation was initiated through a citizens' initiative, gathering 167,000 signatures within a six-month deadline. These legislative processes allowed the public to set the agenda or decide whether a law should be passed. However, if direct democratic processes result in stigmatizing effects on minority groups, can this increasing use be considered desirable?
+
+Therefore, this paper investigates how same-sex marriage legislation involving direct democratic institutions shapes attitudes toward gay rights across European countries. To address this question, I use cross-national survey data from the European Social Survey (ESS), which encompasses 39 countries and 11 survey rounds. The ESS is one of the most comprehensive and high-quality datasets available, which have collected attitudes toward gay rights. Given the hierarchical structure of the dataset--where individuals nested within countries and survey rounds--I employ a multilevel modeling. The findings show that mixed results regarding the relationship between same-sex marriage legislation involving direct democracy and pro-gay attitudes. When the analysis is restricted to individuals exposed to the context before and after the legislation, excluding those from countries where no such legislation occurred, the initially positive and significant effects of direct democratic legislation disappear. Furthermore, among extreme traditional authoritarian party supporters, the relationship is negative. This suggests that extreme parties are more salient in the context of direct democratic processes. 
+
+# Direct Democracy and Same-Sex Marriage Legislation
+## Policy feedback of same-sex marriage and direct democratic process
+
+Early conceptualization of policy feedback suggests that policies, as institutions, shape the incentives and resources available to diverse political actors, including mass public. Policies influence the way political actors perceive the environment surrounding them, and consequently political actors reshape political environment [@Pierson1993]. Building on this foundation, @Mettler_Soss_2004 elaborate on how policies defining community membership--whether a certain group of individuals is included in the broader community--affect citizen's sense of status, group identity, and social cohesion. They further suggest that policies that are inclusive and reduce boundaries between in-group and out-groups alleviate societal stigma by fostering the perception of inclusivity. 
+
+In this vein, same-sex marriage reconstructs the boundaries of community membership by granting the gay and lesbian couples the same legal recognition as heterosexual couples, thus reducing the out-group distinction [@abouchadifinnigan]. Same-sex marriage legislation makes public perceive gay and lesbians as acceptable members of society. Scholars have suggested that inclusive policies toward minorities have legitimizing effects, with consistent empirical evidence supporting this argument [@Kreitzeretal2014; @floresbarclay2016], including several cross-national studies [@Hooghemeeusen2013; @redman2018; @abouchadifinnigan]. 
+
+However, consistent with the idea institutions create distinct political environments, direct democracy may condition different feedback effects on the public. In constrast to the generally positive legitimizing effects of same-sex marriage, studies in the American context have found mixed or even stigmatizing effects arising from the distinct legislative processes involved in direct democracy. These studies suggest that same-sex marriage legislation may provoke negative reactions among the public when subjected to direct democratic processes, due to the nature of these processes [@1998Cald; @DonovanTodd2013Ddac].
+
+Direct democracy is a form of institution that involves the general public in the lawmaking process, as opposed to relying solely on elected representatitves [@matsusaka2018]. It enables citizens to participate in various stages of lawmaking process, such as agenda-setting and decision-making [@Matsusaka2005]. Ballot measures, which allow people to vote "yes" or "no" on specific items listed on the ballot, engage citizens in the decision making process. Initiatives, which permit citizens to propose new laws by collecting a certain number of signatures to qualify for the ballot, enable public involvement in the agenda-setting stage. Referendums, which involve voting on laws already approved by the legislature, also allow citizens to be directly engaged in decision-making. Through these processes, citizens become more attuned to the issues at hand, learning more about policies and issues around them. 
+
+Empirical studies have found that engaging the public in the lawmaking process strengthens civic capacities, as citizens become more informed and interested in political issues by incentivizing them to learn more about the issues [@smith2002; @Tolbert_McNeal_Smith_2003]. This implies that when minority issues are addressed through direct democratic processes, citizens are likely to become more attentive to those issues. However, as individuals become more attentive to minority issues, an important question arises: does this increased attention lead to greater tolerance toward minority groups or animosity toward minority groups? Specifically, when same-sex marriage is put on the ballot or arises through initiatives, do attitudes toward gay rights change?
+
+Direct democratic processes produces additional information regarding minority groups and minority issues. Campaign messaging during ballot initiatives may perpetuate negative stereotypes and predispositions about the group. Especially, campaigns from opposition groups to minority gay rights may produce information that stereotypes gays and lesbians. @DonovanTodd2013Ddac emphasizes that "direct democratic campaigns against minority rights are unique in that they highlight and advertise the threats associated with the targeted minority and the perceived threat (to the minority) of extending rights to that minority." Also, popular votes on minority rights create situations in which citizens must make decisions about minority groups based on their emotional responses and the information provided during campaigns or petitions [@1998Cald, p. 242]. Also, popular votes on minority rights create situations where citizens must make decisions about minority groups based on their emotional responses and the information they receive during petitions or campaigns [@1998Cald: p.242]. This process may provoke stigmatizing effects. Empirical findings from @donovantolbert2013 provide evidence that feedback effects differ when same-sex marriage is subject to direct democratic measures, such as initiatives, and positive feedback effects are not always guaranteed. 
+
+Descriptive works on country cases also illustrate how direct democratic campaigns can generae distinct environments. In Finland, the citizens' initiative for same-sex marriage in 2013 activated the participation not only of marginalizd LGBT groups but also of anti-gay groups. While the Finnish LGBT organization gathered approximately 167,000 signatures, it also triggered a counter-initiative from anti-gay groups, which amassed around 106,000 signatures [@norocelpettersson2023]. Groups that have not been active prior to the initiative become engaged in the debate. In Ireland, the Yes and No campaigns for same-sex marriage employed extensive media strategies, particularly on YouTube, which served as a blind splot in Ireland's strict rule regarding political advertising [@Elkinketal]. The referendum campaings generated significant media attention and produced additional information about gay rights. 
+
+If direct democratic processes provoke stigmatizing effects among the general public, they may diminish or overwhelm the legitimizing effects of same-sx marriage legislation. This suggests that feedback effects of same-sex marraige under direct democratic processes could be null, legitimizing, or stigmatizing. Based on these consdieration, I propose the following three hypotheses:
+
+####
+**Hypothesis 1 (H1)**: Same-sex marriage legislation with direct democracy has no relationship with pro-gay attitudes.
+
+####
+**Hypothesis 2 (H2)**: Same-sex marriage legislation with direct democracy has positive association with pro-gay attitudes.
+
+####
+**Hypothesis 3 (H3)**: Same-sex marriage legislation with direct democracy has negative association with pro-gay attitudes.
+
+
+## Party roles in Direct Democracy and Same-Sex Marriage Campaign
+
+In the direct democratic context, citizens get closer to the core of policymaking process. Considering traditional party roles in the representative policymaking process--agenda-setting and decision-making--the involvement of the general public in these processes under direct democracy may reshape incentives of parties. Furthermore, the feedback effects of direct democratic processes may vary across different groups of people [@donovantolbert2013]. Therefore, I additionally examine whether supporters of parties with unfavorable views on gay rights are less likely to hold favorable attitudes toward gay rights when same-sex marriage legislation involves direct democratic processes. If parties play a prominent role in direct democracy, it is likely that party supporters rely on partisan cues to shape their attitudes. Conversely, if parties are less prominent, their influence may be minimal. Previous literature elaborates on those two conflicting views regarding the role of parties in direct democratic contexts [@Ladnerbrandle1999; @Fatke2014; @PETERSYVETTE2016; @Chang2023].
+
+This first view posits that parties are less prominent in direct democracy because direct democratic institutions serve as an alternaive to the representational function of parties [@Fatke2014]. According to this argument, direct democratic processes empower interest groups to exert greater influence on agenda-setting, policy proposal, and issue campaigns. In such contexts, parties face heightened competition with interest groups and social movement organizations, which have more flexibility to allocate resources toward single issues. These organizations can focus their efforts more effectively than parties, which must distribute limited resources across various issues and may lack sufficient funds and professional staff to prioritize a single policy area [@Ladnerbrandle1999]. Additionally, the demand for for partisan cues may decline as citizen's civic skills improve and the costs of obtaining information decrease [@Fatke2014]. Within Switzerland subnational units, @Fatke2014 finds that individuals in cantons with direct democracy are less likely to have party identification and less likely to be attached to the party. 
+
+The second view, however, argues that direct democracy may actually enhnace the role of parties, contrary to the first argument's expectations. Individuals participating in direct democratic processes may face higher demands for partisan cues, making parties more visible and appealing as sources of guidance [@Fatke2014]. Competitive environments, where a loss may carry significant consequences, can compel parties to compete more aggressively with other parties and interest groups in popular vote campaigns, thereby increasing their importance [@PETERSYVETTE2016]. Furthermore, enhanced civic capacity resulting from direct democracy may strengthen citizens' interest in parties and, in turn, encourage greater political engagement, such as party membership or activism [@Chang2023]. Also, due to the environment of competition, losing means nothing, parties may more directly compete with other parties or interest groups in referendum campaigns, which may increase importance of parties [@PETERSYVETTE2016]. Also, as direct democracy gives an opportunity for voters to make decision, specifically referendums, voters require a cue for their decision, and parties can be an easily reachable provider of those cues [@Ladnerbrandle1999; @Kriesi2006; @Fatke2014; @PETERSYVETTE2016]. In Switzerland case, parties are important in direct democratic process [@Kriesi2006]. @Kriesi2006 suggests that "direct democratic vote heavily depends on the issue specific configuration of power in the political elite." Competition, which is considered as the major element of representative democracy, applies to direct democratic processes as well; because direct democratic processes are indeed embedded within the institutions of representative democracy [@Kriesi2006].
+
+Both views agree on that new and smaller parties have more opportunity in direct democracy, by representing more prominent and clearer view than conventional parties [@Ladnerbrandle1999]. These conflicting perspective generate two distinct set of expectations. If parties are less prominent indirect democratic contexts, their influence on individuals' attitudes toward gay rights would be minimal, and attitudes may not vary based on partisanship. However, if paries are more prominent, individuals' attitudes toward gay rights are likely to align with their party's stance. Supporters of parties that hold unfavorable view on gay rights would be more inclined to adopt their party's ideological position. Based on these expectations, I propose the following two hypotheses: 
+
+####
+**Hypothesis 4 (H4)**: When same-sex marriage legislation involves direct democratic process, supporting a party that holds unfavorable stance to gay rights has no relationship with pro-gay attitudes. 
+
+####
+**Hypothesis 4 (H5)**: When same-sex marriage legislation involves direct democratic process, individuals who supports a party that holds unfavorable stance to gay rights are less likely to have pro-gay attitudes. 
+
+# Data 
+## Dependent Variable: pro-gay attitude
+I use European Social Survey (ESS)[^1] data to measure attitudes toward gay rights. The ESS repeatedly asks the same question, "Gay men and lesbians should be free to live their own life as they wish," across all 11 rounds conducted between 2002 (Round 1) and 2023-2024 (Round 11) in 39 European countries. This consistent question allows for a comparison of how attitudes toward gay rights have varied across different contexts over time. Moreover, the ESS provides the most comprehensive countries and over-time dataset on attitudes toward gay right [@wookotaisolt2024]. 
+
+The ESS samples are representative of individuals aged 15 and over within each participating country, regardless of their nationality, citizenship, or language. Individuals are selected using random probability methods at every stage of sampling. All countries aim for a minimum effective achieved sample size of 1,500 individuals (or 800 in smaller countries). To ensure data comparatibility and accuracy across countries, the ESS implements the survey according to a common ESS specification, which is a shared standard to carry out survey in each country. 
+
+For the measure of pro-gay attitudes, I transformed the original 5-point scale responses (strongly agree, agree, neither, disagree, and strongly disagree) into a binary variable. Responses of 'agree' and 'strongly agree' were coded as 1 (pro-gay attitude), while all other responses were coded as 0. Figure 1 illustrates the trend in attitudes toward gay rights across ESS survey rounds for all participating countries. The vertical line indicates the year first same-sex marriage happend in each country.
+
+[^1]: This dataset is available on the ESS Data Portal <https://ess.sikt.no/en/>. Details on data collection methods available here: <https://europeansocialsurvey.org/methodology/ess-methodology/datacollection>. 
+
+## Independent Variable: Legislation Process
+My main independent variable is the legislation of same-sex marriage with direct democracy. I created a categorical variable for legislation with three categories: no legislation, legislation without direct democracy, and legislation with direct democracy. This variable is included in the model as a series of dummy variables. For the timing of legislation, I use they year when the first same-sex marriage took place in each country. To gather information about the same-sex marriage legislation, I relied on web resources [^2]. Detailed information on the legislation is available in Table 2 in the appendix. 
+
+[^2]: For the legislation categorization, I used US news <https://www.usnews.com/news/best-countries/articles/countries-where-same-sex-marriage-is-legal>, Pew reserach center <https://www.pewresearch.org/religion/fact-sheet/gay-marriage-around-the-world/>, and Wikipedia <https://en.wikipedia.org/wiki/Recognition_of_same-sex_unions_in_Europe#:~:text=As%20of%20February%202024%2C%20twenty,Switzerland%2C%20and%20the%20United%20Kingdo>. 
+
+## Independent Variable: Partisanship
+
+To test H4 and H5, a datast on parties' ideological stances on gay rights is required. For this purpose, I use data from the Chapel Hill Expert Survey (CHES)[^3], which measures parties' ideological positions based on expert assessments. CHES provides the GAL-TAN scale to capture parties' stances on post-material issues, including abortion rights, divorce, and same-sex marriage. On one extreme, GAL representas to green, alternative, and libertarian views on post-material issues. On the other extreme, TAN reflects traditional, authoritarian, and nationalistic perspectives. The GAL-TAN scale offers a more nuanced measure of pary ideologies on post-material issues compared to the traditional left-right ideology scale [@Vachudova2021]. Since the ESS collects individauls' party vote responses, I match the CHES ratings to the parties for which individuals voted. Aigher value of this variable indicates party support for TAN parties. This variable is measured on continous scale ranging from 0 to 10. 
+
+[^3]: This dataset is available from here: <https://www.chesdata.eu/ches-europe>.
+
+
+```{r graph1, fig.height=12.5, fig.width=11, echo = FALSE, message = FALSE, warning = FALSE, fig.cap="Trends in attitudes toward gay rights across European countries from 2002 to 2024 [^4]", fig.fullwidth = TRUE, fig.pos="!htb"}
+
+country_legislation_year <- tibble(
+country_full_name = c("Netherlands", "Finland", "Ireland", "Switzerland", "Austria", "Belgium", "Germany", "Denmark",
+"Spain", "France", "United Kingdom", "Norway", "Portugal", "Sweden", "Slovenia", "Iceland", "Luxembourg",
+"Bulgaria", "Croatia", "Cyprus", "Czechia", "Estonia", "Greece", "Hungary", "Israel", "Italy",
+"Latvia", "Lithuania", "Montenegro", "Poland", "Russia", "Serbia", "Slovakia", "Turkey", "Ukraine"),
+legislation_year = c(2001, 2017, 2015, 2022, 2019, 2003, 2017, 2012, 2005, 2013, 2014, 2009, 2010, 2009, 2022, 2010, 2015,
+NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA, NA, NA, NA, NA, NA, NA, NA))
+
+    df_filtered <- data1 %>%
+      group_by(country_full_name, surveyyear, agree_gay) %>%
+      summarise(count = n(), .groups = 'drop') %>%
+      group_by(country_full_name, surveyyear) %>%
+      mutate(proportion = count / sum(count)) %>%
+      ungroup()
+    
+    df_filtered <- df_filtered %>%
+      left_join(country_legislation_year %>%
+                  mutate(country_full_name = as.character(country_full_name)), 
+                by = "country_full_name") %>%
+      mutate(legislation_year = ifelse(is.na(legislation_year), Inf, legislation_year)) %>%
+      mutate(country_full_name = fct_reorder(country_full_name, legislation_year)) 
+    
+   invisible(levels(df_filtered$country_full_name))
+    
+    vline_data <- tibble(
+      country_full_name = c("Iceland", "Denmark", "Luxembourg", "Slovenia"), 
+      surveyyear = c(2010, 2012, 2015, 2022)  # The years I want to add vertical lines for
+    )
+    
+
+    df_filtered$agree_disagree <- factor(df_filtered$agree_gay, levels = c(0, 1), labels = c("Neither/Disagree", "Agree"))
+    
+    # Create the plot
+    ggplot(df_filtered %>% filter(!is.na(agree_disagree)), aes(x = surveyyear, y = proportion, 
+                                                          color = factor(agree_gay), group = agree_gay)) +
+      geom_point(na.rm = TRUE, size = 1.1) + geom_line(size=1) +
+      facet_wrap(~ reorder(country_full_name, legislation_year), scales = "fixed", ncol = 5) +
+      labs(
+        title = "",
+        x = "Year",
+        y = "Proportion",
+        color = "Pro-Gay Attitude"
+      ) +
+        scale_color_manual(
+    values = c("0" = "#DD8D9D", "1" = "#707CB4"), 
+    labels = c("0" = "Neither/Disagree", "1" = "Agree")) +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Finland" & surveyyear == 2017),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Ireland" & surveyyear == 2015),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Switzerland" & surveyyear == 2022),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Austria" & surveyyear == 2019),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Belgium" & surveyyear == 2003),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Germany" & surveyyear == 2017),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Spain" & surveyyear == 2005),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "France" & surveyyear == 2013),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "United Kingdom" & surveyyear == 2014),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Norway" & surveyyear == 2009),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Portugal" & surveyyear == 2010),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% filter(country_full_name == "Sweden" & surveyyear == 2009),
+                 aes(xintercept = surveyyear), color = "black", size = 1, alpha = 0.6, linetype = "dotted") +
+    geom_vline(data = df_filtered %>% 
+          filter(country_full_name %in% vline_data$country_full_name),  # Filter for countries and years
+        aes(xintercept = legislation_year), 
+        color = "black", size = 1, alpha = 0.6, linetype = "dotted", inherit.aes = FALSE
+      ) +
+  theme_bw() +
+      theme(legend.box = "horizontal",   # Arrange the legend items horizontally
+            legend.box.margin = margin(t = 1.5),  # Add some space between the legend and the plot
+            legend.title = element_text(size = 14),  # Adjust the legend title size
+            legend.text = element_text(size = 14),   # Adjust the legend text size
+            legend.position = "bottom",
+            plot.margin = margin(0, 30, 1, 1),
+            axis.title.x = element_text(margin = margin(t = 9), size=14), 
+            axis.title.y = element_text(margin = margin(r = 9), size=14),
+            axis.ticks.x = element_line(size = 0.8, color = "gray90"),
+            axis.ticks.length = unit(0.17, "cm"),
+            panel.grid.major = element_line(color = "gray90", size = 0.3),
+            panel.grid.minor = element_blank(),
+            strip.text = element_text(size = 14),
+            strip.background = element_blank(),  # Optionally remove facet label background
+            strip.placement = "inside") +
+      scale_x_continuous(limits = c(2002, 2024), breaks = seq(2002, 2024, by = 4)) +
+      guides(color = guide_legend(reverse = TRUE)) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 10),
+            axis.text.y = element_text(size = 10), 
+            axis.ticks.x = element_line(size = 0.7, color = "gray90"),  
+            axis.ticks.y = element_line(size = 0.8, color = "gray90"))
+
+
+```
+
+
+[^4]: Countries are ordered by the year of the first same-sex marriage happened for countries with legislation, and alphabetical order for countries that have never adopted legislation. Netherlands adopted same-sex marriage in 2001 before the ESS started. Vertical dotted line indicates the year of the first same-sex marriage happened. Dots indicate the proportion of Agree and the proportion of Neither/Disagree on the survey years. 
+
+## Control variables
+
+Additionally, I control for several demographic variables: gender, age, income, education, marital status, religiosity, and ideology. Gender is coded as a binary variable of male. For age, missing observations were imputed using the mean value. Education and religiosity are treated as ordinal variables. Income is measured using different scale across survey rounds, so I rescaled the income variable from earlier survey to ensure consistency across the dataset. Additionally, the income variable has a significant number of missing observations. To address this, I imputed missing income values using hot decking method [^5]. Education is measured on a 5-point scale, while religiosity is measured on a 7-point scale; with higher values indicating higher educational attainment and more frequent attendance at religious services, respectively. Marital status is coded as binary variable indicating a married individual. Ideology ranges from 0 to 10 as an interval, with higher values indicating right-leaning ideology. I expect these variables to have a signficant relationship with pro-gay attitudes, as previous studies have found. For instance, male, more religious, and elderly individuals are expected to have a negative association with pro-gay attitudes, while more educated individuals are expected to have pro-gay attitudes [@Hooghemeeusen2013; @redman2018; @abouchadifinnigan]. 
+
+[^5]: I use Mice package in R for imputation. The predictive mean matching (pmm) method in the Mice package performs hot decking imputation, meaning that values are imputed using those from complete cases matched based on a specific metric. Information available here <https://www.rdocumentation.org/packages/mice/versions/3.17.0/topics/mice.impute.pmm.>
+
+
+# Method
+
+I use multilevel logistic regression, given that the data I use have a hierarchical structure--individuals are nested within country and survey round. Logistic model is used because the dependent variable pro-gay attitude is coded as binary. Using an Ordinary Least Square (OLS) model with binary dependent variable would result in biased estimates and nonsensical predictions [@Long1997]. With a binary dependent variable, the variance of errors given the value of independent variables is not constant (heteroscedastic), making OLS estimates inefficient and biased. Additionally, OLS would produce nonsensical predictions, by predicting values outside the [0, 1] range, which is impossible range for a binary dependent variable. Furthermore, OLS assumes linearity, but the relationship between independent variables and the probability of a positive outcome is nonlinear. A one-unit increase in an independent variable does not correspond a constant decrease (or increase) in probability, which is unrealistic. 
+
+A multilevel model is well-suited for investigating the relationship between institutions and individual attitudes. Multilevel modeling allows for an analysis of how institutional factors (such as legislation) influence individual attitudes, such as attitudes toward homosexuality [@HoxJ1998]. Ignoring hierarchical structure of data may not lead to biased estimates but may lead to statistical problems, such as underestimation of the sampling variance, resulting in type I error [@HoxJ1998]. To test H4 and H5, I interact partisanship and same-sex marriage legislation. This interaction term enables an investigation of how individual characteristics—specifically, support for parties with unfavorable views on gay rights—interact with contextual factors, such as legislation. Multilevel modeling is particularly suitable for cross-level interactions, as the effectiveness of this approach depends strongly on the number of groups (countries) rather than simply the total sample size.
+
+# Findings
+
+Table 1 presents the results from multilevel logistic models, with pro-gay attitudes as the dependent variable. All models include demographic variables as controls (gender, age, income, education, religiosity, marital status, and ideology). Model 1 and Model 3 test the relationship between same-sex marriage legislation with direct democracy and pro-gay attitudes. Model 1 includes all countries in the dataset, while Model 3 limits the sample to only those countries that have legislated same-sex marriage. This narrower focus restricts the sample to individuals surveyed both before and after the legislation in these countries. While this is not a Difference-in-Differences model, it allows for a comparison between the attitudes of individuals surveyed before and after the legislation within these countries. However, this approach reduces the generalizability of the findings, as the results apply only to countries that have adopted same-sex marriage legislation.
+
+The results from Model 1 support H2, which posits a positive relationship between same-sex marriage legislation with direct democracy and pro-gay attitudes, holding other variables constant. However, when countries that have never adopted same-sex marriage are excluded in Model 3, the positive association disappears. In this restricted sample, same-sex marriage legislation with direct democracy no longer has any effect on pro-gay attitudes. On the other hand, the relationship between same-sex marriage legislation without direct democracy remains positive and significant in Model 3.
+
+
+```{r multilevel models,echo = FALSE, message = FALSE, warning = FALSE, results='asis'}
+library(lme4)
+
+model1 <- readRDS("Data/multilevel-agree-legislation-male-age-income-education-married-religiosity-ideology.rds") 
+model2 <- readRDS("Data/multilevel-agree-legislation-galtan-interaction-male-age-income-education-married-religiosity-ideology.rds")
+
+model3 <- readRDS("Data/multilevel-country-sub.rds") 
+model4 <- readRDS("Data/multilevel-country-sub-interaction.rds")
+
+num_country_m1 <- as.numeric(sapply(ranef(model1),nrow)[1])
+num_round_m1 <- as.numeric(sapply(ranef(model1),nrow)[2])
+
+num_country_m2 <- as.numeric(sapply(ranef(model2),nrow)[1])
+num_round_m2 <- as.numeric(sapply(ranef(model2),nrow)[2])
+
+num_country_m3 <- as.numeric(sapply(ranef(model3),nrow)[1])
+num_round_m3 <- as.numeric(sapply(ranef(model3),nrow)[2])
+
+num_country_m4 <- as.numeric(sapply(ranef(model4),nrow)[1])
+num_round_m4 <- as.numeric(sapply(ranef(model4),nrow)[2])
+
+tribble(~stat, ~model1, ~model2, ~model3, ~model4,  
+        "Number of countries", num_country_m1, num_country_m2, num_country_m3, num_country_m4, 
+        "Number of ESS-rounds", num_round_m1, num_round_m2, num_round_m3, num_round_m4) -> mod_stats
+
+covariate_labels <- c(
+  "Legislation without direct democracy", 
+  "Legislation with direct democracy", 
+  "Partisanship (GAL-TAN)",
+  "Male", 
+  "Age", 
+  "Income", 
+  "Education",
+  "Married",
+  "Religiosity", 
+  "Ideology-right", 
+  "Legislation without direct democracy \\\\ x Partisanship (GAL-TAN)",
+  "Legislation with direct democracy \\\\ x Partisanship (GAL-TAN)"
+)
+
+fixed_effects_m1 <- fixef(model1)
+
+fixed_effects_m2 <- fixef(model2)
+
+fixed_effects_m3 <- fixef(model3)
+
+fixed_effects_m4 <- fixef(model4)
+
+
+stargazer(model1, model2, model3, model4, type = "latex", 
+          title = "Multilevel logistic regression results",
+          header = FALSE,
+          font.size = "normalsize",
+          dep.var.labels=c("Pro-gay attitude"),
+          style="apsr",
+          no.space = TRUE,
+          column.sep.width = "-1pt",
+          coef = list(fixed_effects_m1, fixed_effects_m2),
+          covariate.labels = covariate_labels,
+          column.labels = c("Model 1", "Model 2", "Model 3", "Model 4"),
+          add.lines = lapply(1:nrow(mod_stats), function(i) unlist(mod_stats[i, ])),
+          model.numbers = FALSE)
+```
+
+
+The results for H4 and H5 are elaborated in Model 2 and Model 4. These models include interaction terms between same-sex marriage legislation and partisanship. Model 2 uses the entire dataset of countries with existing party support data, while Model 4 excludes countries that have not adopted same-sex marriage legislation. To better understand the relationship between these variables, I created marginal effects plots, presented in Figure 2 and Figure 3. These figures illustrate how the interaction between same-sex marriage legislation and partisanship relates to pro-gay attitudes, based on the results from Model 2 and Model 4. The graphs in the top row of figures display the results with a 95% confidence interval, while the graphs in the bottom row use a 90% confidence interval. 
+
+```{r multilevel interplot 1, fig.width = 7, fig.height = 6.5, echo = FALSE, message = FALSE, warning = FALSE, fig.cap="Marginal effects of legislation on pro-gay attitude by GAL-TAN partisanship (Model 2) - Estimated on the latent scale", fig.pos="!t"}
+
+interplot1 <- interplot(m = model2, var1 = "legislation_factor", var2 = "galtan", facet_labs = c("Legislation without direct democracy", "Legislation with direct democracy")) +
+  theme_bw() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme(plot.title = element_text(face="bold"),
+        plot.margin = margin(5, 50, 5, 5)) +
+  labs(caption = "95% Confidence level \nBase term: No legislation",
+       x = "",
+       y = "Estimated conditional coefficient", size = 12)
+
+interplot2 <- interplot(m = model2, var1 = "legislation_factor", var2 = "galtan", facet_labs = c("Legislation without direct democracy", "Legislation with direct democracy"), ci = 0.9) +
+  theme_bw() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme(plot.title = element_text(face="bold"),
+        plot.margin = margin(5, 50, 5, 5)) +
+  labs(caption = "90% Confidence level \nBase term: No legislation",
+       x = "Partisanship (GAL-TAN)",
+       y = "Estimated conditional coefficient", size = 12)
+grid.arrange(interplot1 , interplot2, ncol = 1)
+```
+
+Figure 2 shows conditional coefficient estimates for pro-gay attitudes of same-sex marriage legislation across the values of partisanship, based on model3. Plots show that partisanship matters in same-sex marriage legislation with direct democratic process, however this is supported when confidence level is 90%. The marginal effects of legislation without direct democratic processes on pro-gay attitudes are significantly positive, regardless of partisanship. This suggests that individuals, even those who support parties with traditional, authoritarian, and nationalistic positions (TAN parties), are more likely to hold pro-gay attitudes when same-sex marriage legislation is passed—compared to situations where no such legislation exists. This finding implies that partisanship is less influential when the legislative process does not involve direct democracy, and the legitimizing effects of same-sex marriage legislation are more widespread and extensive across all partisan groups.
+
+Conversely, the right side of Figure 2 reveals that the marginal effects of same-sex marriage legislation with direct democracy are only significantly positive for individuals who support green, alternative, and libertarian parties (GAL parties). While the marginal effects for other partisan groups are not statistically significant, the difference between individuals who support GAL and those who support TAN parties is notable. This difference is significant because their confidence intervals do not overlap, indicating that partisanship influences the effects of legislation involving direct democracy on pro-gay attitudes. With a 90% confidence level, individuals whose partisanship is aligned with TAN parties are significantly less likely to hold pro-gay attitudes compared to individuals living in countries with no same-sex marriage legislation. These findings support H5, which posits that individuals who support parties with unfavorable views toward gay rights are less likely to hold pro-gay attitudes in the context of same-sex marriage legislation involving direct democratic processes.
+
+
+```{r multilevel interplot 2, fig.width = 7, fig.height = 6.5, echo = FALSE, message = FALSE, warning = FALSE, fig.cap="Marginal effects of legislation on pro-gay attitude by GAL-TAN partisanship (Model 4) - Estimated on the latent scale", fig.pos="!t"}
+interplot3 <- interplot(m = model4, var1 = "legislation_factor", var2 = "galtan", facet_labs = c("Legislation without direct democracy", "Legislation with direct democracy")) +
+  theme_bw() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme(plot.title = element_text(face="bold"),
+        plot.margin = margin(5, 50, 5, 5)) +
+  labs(caption = "95% Confidence level \nBase term: No legislation",
+       x = "",
+       y = "Estimated conditional coefficient", size = 12)
+
+interplot4 <- interplot(m = model4, var1 = "legislation_factor", var2 = "galtan", facet_labs = c("Legislation without direct democracy", "Legislation with direct democracy"), ci = 0.9) +
+  theme_bw() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  theme(plot.title = element_text(face="bold"),
+        plot.margin = margin(5, 50, 5, 5)) +
+  labs(caption = "90% Confidence level \nBase term: No legislation",
+       x = "Partisanship (GAL-TAN)",
+       y = "Estimated conditional coefficient", size = 12)
+
+grid.arrange(interplot3, interplot4, ncol = 1)
+
+```
+
+Figure 3 presents the results from Model 4, excluding countries that have never adopted same-sex marriage. The relationship here is somewhat different but still supports H5. In these countries, supporters of TAN parties remain less likely to hold pro-gay attitudes when same-sex marriage legislation involves direct democracy. However, interestingly, on the left side of the figure, which shows the marginal effects of legislation without direct democracy, demonstrates a negative effect on pro-gay attitudes among individuals who support GAL (green, alternative, and authoritarian) parties.
+
+# Conclusion
+
+The results of this study suggest that the legitimizing effects of same-sex marriage legislation on public attitudes toward gay rights may be less solid when the legislation involves direct democratic processes. While citizens in these contexts are more likely to engage with and be attentive to issues related to gays and lesbians, the environments created by the inclusion of the general public in the legislative process do not necessarily favor minority groups. In fact, direct democracy--which can open the door for widespread public participation in contentious social issues--does not always result in positive effects. Rather, the feedback effects from such legislation indicate that in-group vs. out-group dynamics may become more polarized, with the possibility of backlash from groups that are opposed to the changes. These findings implies that when direct democracy is involved in same-sex marriage, it may even lead to stigmatizing effects.
+
+The interaction between same-sex marriage legislation and partisanship offers a more nuanced understanding of how direct democratic processes shape attitudes. Consistent with @donovantolbert2013, who found stigmatizing effects in U.S. states with initiatives, my analysis identifies significant backlash effects primarily among supporters of extreme TAN (traditional, authoritarian, nationalistic) parties. In contexts where direct democracy is involved in same-sex marriage legislation, individuals are more likely to align with their party's stance on the issue. This is particularly true for those who support TAN parties, which tend to espouse traditional authoritarian views on social issues. Supporters of these parties are more likely to adopt their party's extreme positions, even if these positions oppose the borader societal norms.
+
+While previous cross-national studies have not identified significant backlash effects in attitudes toward gay rights [redman2018], this study highlights how direct democratic processes can introduce variation in attitudes toward same-sex marriage, depending on individuals' party affiliations. Specifically, among TAN party supporters, the legitimizing effects of same-sex marriage legislation are weak, and instead, backlash effects emerge. This suggests that in contexts where direct democracy is involved in the lawmaking process, party cues become more salient, leading individuals to align their personal views with their party's stance on the issue. As a result, parties with extremely intolerant view on minority rights may actively leverage the direct democratic process—-such as referenda or popular initiatives—-to amplify their messaging and encourage their supporters to reject inclusive societal norms.
+
+This study further suggests that societal norms constructed through direct democratic processes may be less stable. Given that the public is more directly involved in the lawmaking process, these norms may be subject to greater contestation, leading to a greater likelihood of backlash or even repeal. In cases where same-sex marriage is legalized through a direct democratic process, there is always the potential for future initiatives that may seek to overturn or undermine the gains made. This is exemplified in the Finnish case, where after same-sex marriage was legalized, anti-gay organizations gathered enough signatures to launch a counter-initiative with the slogan "Real/Genuine Marriage" [@norocelpettersson2023]. While the initiative was unsuccessful, this illustrates the risk of backlash inherent in direct democratic processes, which could potentially reverse or challenge the societal norms established through previous legislative decisions.
+
+# Appendix
+
+\singlespacing
+```{r table, echo=FALSE, message = FALSE, warning = FALSE, results = 'asis'}
+library(kableExtra)
+same_sex_marriage_data <- data.frame(
+  country = c("Netherlands", "Belgium", "Spain", "Sweden", "Norway", "Portugal", "Iceland", "Denmark", "France", "United Kingdom", "Luxembourg", "Ireland", "Finland", "Germany", "Austria", "Switzerland", "Slovenia"),
+  legislation = c("Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "Without DD", "With DD", "With DD", "Without DD", "Without DD", "With DD", "Without DD"),
+  year = c(2001, 2003, 2005, 2009, 2009, 2010, 2010, 2012, 2013, 2014, 2015, 2015, 2017, 2017, 2019, 2022, 2022),
+  notes = c("Bill passed the House on Sep 2000", 
+  "Bill passed the Chamber of Representatives on Jan 2003", 
+  "Bill passed the Parliament on April 2005", 
+  "Bill passed the Parliament on April 2009", 
+  "Bill passed the upper House June 2008", 
+  "Bill passed the Parliament on Feb 2010, court ruling on April 2010", 
+  "Bill passed the Parliament June 2010", 
+  "Bill passed the Parliament on June 2012",
+  "Bill passed the National Assembly on April 2013", 
+  "England and Wales - July 2013, Scotland - Feb 2014, Northern Ireland - July 2019",
+  "Approved by the Chamber of Deputies on June 2014", 
+  "Irish Parliament passed the marriage act then referendum held", 
+  "Started from citizens' initiative, 167,000 signature submitted to parliament on December 2013. Bill approved December 2014", 
+  "Bundestag passed on June 2017, Bundesrat on July", 
+  "Court ruling 2017 -> No parliamentary action until January 2019 thereby legalized", 
+  "Legislation passed on December 2020, referendum held on Sep 2021, and the law went into force on July 2022", 
+  "Bill passed the National Assembly on Oct 2022"))
+
+
+
+kable(same_sex_marriage_data, "latex", booktabs = T, linesep = "", 
+      col.names = c("Country", "Legislation", "First marriage year", "Note"), position = "!t",
+      caption = "Same-sex marriage legislation information") %>%
+  kable_styling(position = "center")    %>%
+column_spec(4, width = "8.7cm") %>%
+row_spec(0:17, font_size=9.5) %>%
+row_spec(12:13, bold = TRUE) %>%
+row_spec(16, bold = TRUE) 
+```
